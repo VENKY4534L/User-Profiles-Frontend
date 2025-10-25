@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profiles Manager</title>
+    
+      <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">LOGO</div>
+      <div class="header-icons">
+        <button class="icon-btn" aria-label="Notifications">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </button>
+        <button class="icon-btn" aria-label="Messages">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            ></path>
+          </svg>
+        </button>
+        <button class="avatar-btn" aria-label="Profile">👤</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+      <!-- Users List View -->
+      <div id="usersListView">
+        <div class="page-header">
+          <h1 class="page-title">Users</h1>
+          <button class="btn btn-primary" id="addUserBtn">
+            <span>+</span> Add user
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading" style="display: none">
+          <div class="spinner"></div>
+          <p>Loading users...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="error-message">
+          Failed to load users. Please try again.
+        </div>
+
+        <!-- Users Table -->
+        <div class="card">
+          <div class="table-container">
+            <table id="usersTable">
+              <thead>
+                <tr>
+                  <th>Sr. No</th>
+                  <th>User name</th>
+                  <th>E-mail</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody">
+                <!-- Users will be populated here -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none">
+          <div class="empty-state-icon">👥</div>
+          <p>No users found. Add your first user!</p>
+        </div>
+      </div>
+
+      <!-- User Detail View -->
+      <div id="userDetailView" class="user-detail-container">
+        <button class="btn btn-secondary back-btn" id="backToListBtn">
+          ← Back to Users
+        </button>
+
+        <div class="user-profile-header">
+          <div class="user-avatar-large">
+            <svg class="avatar-icon" viewBox="0 0 24 24">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="user-info">
+            <h2 class="user-name" id="detailUserName">Dave Richards</h2>
+            <div class="user-contact">
+              <div class="contact-item">
+                <span id="detailUserEmail">dave@mail.com</span>
+                <button
+                  class="icon-btn"
+                  style="padding: 2px; font-size: 14px"
+                  onclick="copyToClipboard(document.getElementById('detailUserEmail').textContent)"
+                >
+                  📋
+                </button>
+              </div>
+              <div class="contact-item" id="detailUserContact">
+                +91 8332883854
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+          <button class="tab active" data-tab="basicInfo">
+            Basic Info
+            <span class="tab-badge"></span>
+          </button>
+          <button class="tab" data-tab="education">
+            Education &amp; Skills
+          </button>
+          <button class="tab" data-tab="experience">Experience</button>
+        </div>
+
+        <!-- Tab Contents -->
+        <div class="tab-content active" id="basicInfoTab">
+          <div class="detail-section">
+            <div class="section-header">
+              <h3 class="section-title">Basic Details</h3>
+              <button class="edit-btn" onclick="editBasicInfo()">✏️</button>
+            </div>
+            <form id="basicInfoForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">First name</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="firstName"
+                    placeholder="e.g. John"
+                    disabled
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Last name</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="lastName"
+                    placeholder="e.g. Doe"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Year of birth</label>
+                  <select class="form-select" id="yearOfBirth" disabled>
+                    <option value="">YYYY</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Gender</label>
+                  <select class="form-select" id="gender" disabled>
+                    <option value="">Select an option</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Phone number</label>
+                  <input
+                    type="tel"
+                    class="form-input"
+                    id="phoneNumber"
+                    placeholder="8332883854"
+                    disabled
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Alternate Phone no</label>
+                  <input
+                    type="tel"
+                    class="form-input"
+                    id="altPhoneNumber"
+                    placeholder="e.g. 9876543210"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Email ID</label>
+                  <input
+                    type="email"
+                    class="form-input"
+                    id="emailId"
+                    placeholder="e.g. mrnobody@mail.com"
+                    disabled
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Address</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="address"
+                    placeholder="Enter here"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Pincode</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="pincode"
+                    placeholder="Enter here"
+                    disabled
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Domicile state</label>
+                  <select class="form-select" id="domicileState" disabled>
+                    <option value="">Select an option</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Domicile country</label>
+                <select class="form-select" id="domicileCountry" disabled>
+                  <option value="">Select an option</option>
+                </select>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="tab-content" id="educationTab">
+          <div class="detail-section">
+            <div class="section-header">
+              <h3 class="section-title">Education Details</h3>
+              <button class="edit-btn" onclick="editEducation()">✏️</button>
+            </div>
+            <form id="educationForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">School / College</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="schoolCollege"
+                    placeholder="e.g. Lincoln College"
+                    disabled
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Highest degree or equivalent</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="degree"
+                    placeholder="e.g. Bachelors in Technology"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Course</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="course"
+                    placeholder="e.g. Computer science engineering"
+                    disabled
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Year of completion</label>
+                  <select class="form-select" id="completionYear" disabled>
+                    <option value="">YYYY</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group" style="grid-column: span 1">
+                  <label class="form-label">Grade</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="grade"
+                    placeholder="Enter here"
+                    disabled
+                  />
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="detail-section">
+            <div class="section-header">
+              <h3 class="section-title">Skills &amp; Projects</h3>
+              <button class="edit-btn" onclick="editSkills()">✏️</button>
+            </div>
+            <form id="skillsForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Skills</label>
+                  <textarea
+                    class="form-textarea"
+                    id="skills"
+                    placeholder="Enter here"
+                    disabled
+                  ></textarea>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Projects</label>
+                  <textarea
+                    class="form-textarea"
+                    id="projects"
+                    placeholder="Enter here"
+                    disabled
+                  ></textarea>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="tab-content" id="experienceTab">
+          <div class="detail-section">
+            <div class="section-header">
+              <h3 class="section-title">Work Experience</h3>
+              <button class="edit-btn" onclick="editExperience()">✏️</button>
+            </div>
+            <form id="experienceForm">
+              <div class="form-group">
+                <label class="form-label">Domain</label>
+                <input
+                  type="text"
+                  class="form-input"
+                  id="domain1"
+                  placeholder="e.g. Technology"
+                  disabled
+                />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Sub-domain</label>
+                  <input
+                    type="text"
+                    class="form-input"
+                    id="subdomain1"
+                    placeholder="e.g. MERN Stack"
+                    disabled
+                  />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Experience</label>
+                  <select class="form-select" id="experience1" disabled>
+                    <option value="">Select an option</option>
+                    <option value="0-1">0-1 years</option>
+                    <option value="1-3">1-3 years</option>
+                    <option value="3-5">3-5 years</option>
+                    <option value="5+">5+ years</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <div class="detail-section">
+            <div class="section-header">
+              <h3 class="section-title">LinkedIn</h3>
+              <button class="edit-btn" onclick="editLinkedIn()">✏️</button>
+            </div>
+            <form id="linkedinForm">
+              <div class="form-group">
+                <label class="form-label">Profile URL</label>
+                <input
+                  type="url"
+                  class="form-input"
+                  id="linkedinUrl"
+                  placeholder="linkedin.com/in/mrbean"
+                  disabled
+                />
+              </div>
+            </form>
+          </div>
+
+          <div class="detail-section">
+            <div class="section-header">
+              <h3 class="section-title">Resume</h3>
+              <button class="edit-btn" onclick="editResume()">✏️</button>
+            </div>
+            <form id="resumeForm">
+              <div class="form-group">
+                <label class="file-upload-label" for="resumeFile">
+                  📎 Choose file
+                </label>
+                <input
+                  type="file"
+                  id="resumeFile"
+                  class="file-input"
+                  accept=".pdf,.doc,.docx"
+                  disabled
+                />
+                <div class="file-name" id="resumeFileName">myresume.pdf</div>
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  style="margin-top: 12px"
+                  onclick="viewResume()"
+                >
+                  View
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Add/Edit User Modal -->
+    <div class="modal-overlay" id="userModal">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modalTitle">Add User</h2>
+          <button class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="error-message" id="modalError"></div>
+          <form id="userForm">
+            <div class="form-group">
+              <label class="form-label">Name of the user</label>
+              <input
+                type="text"
+                class="form-input"
+                id="userName"
+                placeholder="Type here"
+                required
+              />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">E-mail</label>
+                <input
+                  type="email"
+                  class="form-input"
+                  id="userEmail"
+                  placeholder="Type here"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Contact</label>
+                <input
+                  type="tel"
+                  class="form-input"
+                  id="userContact"
+                  placeholder="Type here"
+                  required
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+          <button class="btn btn-primary" id="saveUserBtn">Add</button>
+        </div>
+      </div>
+    </div>
+
+      <script src="script.js"></script>
+  </body>
+</html>
